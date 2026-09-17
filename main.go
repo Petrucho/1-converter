@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func main() {
 	const USD_EUR = 1.1
@@ -14,26 +17,69 @@ func main() {
 }
 
 func getInput() (return_sum float64, return_fromCurrency, return_toCurrency string) {
+	var endProgram bool = false
 
-	fmt.Print("Введите исходящую валюту: ")
-	_, err := fmt.Scan(&return_fromCurrency)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
+outerLoop1:
+	for {
+		fmt.Print("Введите исходящую валюту (USD, EUR, RUB)\nили для завершения программы нажмите Enter: ")
+		fmt.Scan(&return_fromCurrency)
+
+		switch strings.ToUpper(return_fromCurrency) {
+		case "":
+			fmt.Println("Выбрано завершение программы")
+			endProgram = true
+			break outerLoop1
+		case "USD", "EUR", "RUB":
+			break outerLoop1
+		default:
+			continue
+		}
 	}
 
-	fmt.Print("Введите сумму: ")
-	_, err = fmt.Scan(&return_sum)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
+	if !endProgram {
+	outerLoop2:
+		for {
+			fmt.Print("Введите сумму больше нуля\nили для выхода из программы нажмите Enter: ")
+			_, err := fmt.Scan(&return_sum)
+			switch {
+			case return_sum > 0:
+				break outerLoop2
+			case err != nil:
+				endProgram = true
+				break outerLoop2
+			default:
+				continue
+			}
+		}
 
-	fmt.Print("Введите целевую валюту: ")
-	_, err = fmt.Scan(&return_toCurrency)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
+		if !endProgram {
+		outerLoop3:
+			for {
+				switch strings.ToUpper(return_fromCurrency) {
+				case "USD":
+					fmt.Print("Введите целевую валюту 'EUR', 'RUB': ")
+				case "EUR":
+					fmt.Print("Введите целевую валюту 'USD', 'RUB': ")
+				case "RUB":
+					fmt.Print("Введите целевую валюту 'USD', 'EUR': ")
+				default:
+					error_string := fmt.Sprintf("Должно остаться только USD или EUR или RUB!\nа оказалось %s", return_fromCurrency)
+					panic(error_string)
+				}
+				fmt.Scan(&return_toCurrency)
+				switch strings.ToUpper(return_toCurrency) {
+				case "":
+					fmt.Println("Выбрано завершение программы")
+					endProgram = true
+					break outerLoop3
+				case "USD", "EUR", "RUB":
+					break outerLoop3
+				default:
+					continue
+				}
+
+			}
+		}
 	}
 	return
 }
