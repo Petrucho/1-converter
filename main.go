@@ -13,38 +13,54 @@ func main() {
 	fmt.Printf("Конвертированная сумма: %0.2f\n", calcValues(getInput()))
 }
 
-func getInput() (return_sum float64, return_fromCurrency, return_toCurrency string) {
-outerLoop1:
+func getInput() (return_amount float64, return_fromCurrency, return_toCurrency string) {
+	return_fromCurrency = getFromCurrency()
+	return_amount = getAmount()
+	return_toCurrency = getToCurrency(return_fromCurrency)
+	return
+}
+
+func getFromCurrency() (return_fromCurrency string) {
+outerLoop:
 	for {
 		fmt.Print("Введите исходящую валюту (USD, EUR, RUB): ")
-		fmt.Scan(&return_fromCurrency)
-
-		switch strings.ToUpper(return_fromCurrency) {
+		_, err := fmt.Scan(&return_fromCurrency)
+		if err != nil {
+			continue
+		}
+		return_fromCurrency = strings.ToUpper(return_fromCurrency)
+		switch return_fromCurrency {
 		case "USD", "EUR", "RUB":
-			break outerLoop1
+			break outerLoop
 		default:
 			continue
 		}
 	}
+	return
+}
 
-outerLoop2:
+func getAmount() (return_amount float64) {
+outerLoop:
 	for {
 		fmt.Print("Введите сумму больше нуля: ")
-		_, err := fmt.Scan(&return_sum)
-		switch {
-		case return_sum > 0:
-			break outerLoop2
-		case err != nil:
-			fmt.Printf("какая-то ошибка ввода суммы\n")
+		_, err := fmt.Scan(&return_amount)
+		if err != nil {
 			continue
+		}
+		switch {
+		case return_amount > 0:
+			break outerLoop
 		default:
 			continue
 		}
 	}
+	return
+}
 
-outerLoop3:
+func getToCurrency(param_fromCurrency string) (return_toCurrency string) {
+outerLoop:
 	for {
-		switch strings.ToUpper(return_fromCurrency) {
+		switch param_fromCurrency {
 		case "USD":
 			fmt.Print("Введите целевую валюту 'EUR', 'RUB': ")
 		case "EUR":
@@ -52,36 +68,41 @@ outerLoop3:
 		case "RUB":
 			fmt.Print("Введите целевую валюту 'USD', 'EUR': ")
 		default:
-			error_string := fmt.Sprintf("Должно остаться только USD или EUR или RUB!\nа оказалось %s", return_fromCurrency)
+			error_string := fmt.Sprintf("Должно остаться только USD или EUR или RUB!\nа оказалось %s", param_fromCurrency)
 			panic(error_string)
 		}
-		fmt.Scan(&return_toCurrency)
-		switch strings.ToUpper(return_toCurrency) {
-		case "USD", "EUR", "RUB":
-			break outerLoop3
+		_, err := fmt.Scan(&return_toCurrency)
+		if err != nil {
+			continue
+		}
+		return_toCurrency = strings.ToUpper(return_toCurrency)
+		switch {
+		case param_fromCurrency == return_toCurrency:
+			continue
+		case return_toCurrency == "USD" || return_toCurrency == "EUR" || return_toCurrency == "RUB":
+			break outerLoop
 		default:
 			continue
 		}
 	}
-
 	return
 }
 
 func calcValues(amount_p float64, fromCurrency_p string, toCurrency_p string) (return_convertedAmount float64) {
 	//fmt.Printf("running calcValues with params:\namount_p: %0.2f\nfromCurrency_p: %s\ntoCurrency_p: %s\n", amount_p, fromCurrency_p, toCurrency_p)
-	if (amount_p != 0) || (fromCurrency_p != "") || (toCurrency_p != "") {
+	if (amount_p != 0) && (fromCurrency_p != "") && (toCurrency_p != "") {
 		switch {
-		case strings.ToUpper(fromCurrency_p) == "USD" && strings.ToUpper(toCurrency_p) == "EUR":
+		case fromCurrency_p == "USD" && toCurrency_p == "EUR":
 			return_convertedAmount = USD_EUR * amount_p
-		case strings.ToUpper(fromCurrency_p) == "USD" && strings.ToUpper(toCurrency_p) == "RUB":
+		case fromCurrency_p == "USD" && toCurrency_p == "RUB":
 			return_convertedAmount = USD_RUB * amount_p
-		case strings.ToUpper(fromCurrency_p) == "EUR" && strings.ToUpper(toCurrency_p) == "USD":
-			return_convertedAmount = amount_p - (USD_EUR / amount_p)
-		case strings.ToUpper(fromCurrency_p) == "EUR" && strings.ToUpper(toCurrency_p) == "RUB":
+		case fromCurrency_p == "EUR" && toCurrency_p == "USD":
+			return_convertedAmount = amount_p / USD_EUR
+		case fromCurrency_p == "EUR" && toCurrency_p == "RUB":
 			return_convertedAmount = EUR_RUB * amount_p
-		case strings.ToUpper(fromCurrency_p) == "RUB" && strings.ToUpper(toCurrency_p) == "USD":
+		case fromCurrency_p == "RUB" && toCurrency_p == "USD":
 			return_convertedAmount = amount_p / USD_RUB
-		case strings.ToUpper(fromCurrency_p) == "RUB" && strings.ToUpper(toCurrency_p) == "EUR":
+		case fromCurrency_p == "RUB" && toCurrency_p == "EUR":
 			return_convertedAmount = amount_p / EUR_RUB
 		}
 	} else {
