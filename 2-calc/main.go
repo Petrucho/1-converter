@@ -26,18 +26,22 @@ func main() {
 		default:
 			break
 		}
+	} else {
+		fmt.Printf("Slice is empty!")
 	}
 }
 
 func getOperation() (return_Operation string) {
 outerLoop:
 	for {
+		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Введите операцию (AVG, SUM, MED): ")
-		_, err := fmt.Scan(&return_Operation)
+		read_Operation, err := reader.ReadString('\n')
 		if err != nil {
 			continue
 		}
-		return_Operation = strings.ToUpper(return_Operation)
+
+		return_Operation = strings.ToUpper(strings.TrimSpace(read_Operation))
 		switch return_Operation {
 		case "AVG", "SUM", "MED":
 			break outerLoop
