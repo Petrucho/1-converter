@@ -54,9 +54,9 @@ func getSlice() (return_slice []int) {
 	if scanner.Scan() {
 		line := scanner.Text()
 		// Разбиваем строку по запятым
-		parts := strings.Split(strings.TrimSpace(line), ",")
+		parts := strings.Split(line, ",")
 		for _, part := range parts {
-			num, err := strconv.Atoi(part)
+			num, err := strconv.Atoi(strings.TrimSpace(part))
 			if err == nil {
 				return_slice = append(return_slice, num)
 			} else {
@@ -81,9 +81,9 @@ func operationSUM(param_slice []int) (return_SUM int) {
 func operationMED(param_slice []int) (return_MED int) {
 	numberCount := len(param_slice)
 	if numberCount%2 == 0 {
-		return_MED = (param_slice[numberCount/2] + param_slice[(numberCount/2)+1]) / 2
+		return_MED = (param_slice[(numberCount/2)-1] + param_slice[(numberCount/2)]) / 2
 	} else {
-		return_MED = (param_slice[(numberCount/2)+1])
+		return_MED = (param_slice[(numberCount / 2)])
 	}
 	return
 }
