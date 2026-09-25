@@ -5,14 +5,10 @@ import (
 	"strings"
 )
 
-const USD_EUR = 1.1
-const USD_RUB = 100.0
-const EUR_RUB = USD_EUR * USD_RUB
-
 type CurrencyMapType = map[string]map[string]float64
 
 func main() {
-	CurrencyMap := CurrencyMapType{"USD": {"EUR": 1.1, "RUB": 100.}, "EUR": {"USD": 0.90909, "RUB": 110.}, "RUB": {"USD": 0.01, "EUR": 0.0090909}}
+	CurrencyMap := CurrencyMapType{"USD": {"EUR": 1.1, "RUB": 100.}, "EUR": {"USD": 1 / 1.1, "RUB": 110.}, "RUB": {"USD": 1 / 100., "EUR": 1 / 110.}}
 outerLoop:
 	for {
 		switch getMenu() {
@@ -119,7 +115,6 @@ func calcValues(currencyMap_p CurrencyMapType, amount_p float64, fromCurrency_p 
 	if (amount_p != 0) && (fromCurrency_p != "") && (toCurrency_p != "") {
 		returned_rate, found_rate := GetRate(currencyMap_p, fromCurrency_p, toCurrency_p)
 		if found_rate {
-			fmt.Printf("returned_rate: %.2f\n", returned_rate)
 			return_convertedAmount = returned_rate * amount_p
 		} else {
 			fmt.Printf("Не найден курс для %s→%s", fromCurrency_p, toCurrency_p)
