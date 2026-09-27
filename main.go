@@ -5,16 +5,20 @@ import (
 	"strings"
 )
 
+const USD_EUR = 1.1
+const USD_RUB = 100.
+const EUR_RUB = 110.
+
 type CurrencyMapType = map[string]map[string]float64
 
 func main() {
-	CurrencyMap := CurrencyMapType{"USD": {"EUR": 1.1, "RUB": 100.}, "EUR": {"USD": 1 / 1.1, "RUB": 110.}, "RUB": {"USD": 1 / 100., "EUR": 1 / 110.}}
+	CurrencyMap := CurrencyMapType{"USD": {"EUR": USD_EUR, "RUB": USD_RUB}, "EUR": {"USD": 1 / USD_EUR, "RUB": EUR_RUB}, "RUB": {"USD": 1 / USD_RUB, "EUR": 1 / EUR_RUB}}
 outerLoop:
 	for {
 		switch getMenu() {
 		case 1:
 			returned_amount, returned_fromCurrency, returned_toCurrency := getInput()
-			fmt.Printf("Конвертированная сумма: %0.2f\n", calcValues(CurrencyMap, returned_amount, returned_fromCurrency, returned_toCurrency))
+			fmt.Printf("Конвертированная сумма: %0.2f\n", calcValues(&CurrencyMap, returned_amount, returned_fromCurrency, returned_toCurrency))
 		case 2:
 			break outerLoop
 		default:
@@ -110,10 +114,9 @@ outerLoop:
 	return
 }
 
-func calcValues(currencyMap_p CurrencyMapType, amount_p float64, fromCurrency_p string, toCurrency_p string) (return_convertedAmount float64) {
-	//fmt.Printf("running calcValues with params:\namount_p: %0.2f\nfromCurrency_p: %s\ntoCurrency_p: %s\n", amount_p, fromCurrency_p, toCurrency_p)
+func calcValues(currencyMap_p *CurrencyMapType, amount_p float64, fromCurrency_p string, toCurrency_p string) (return_convertedAmount float64) {
 	if (amount_p != 0) && (fromCurrency_p != "") && (toCurrency_p != "") {
-		returned_rate, found_rate := GetRate(currencyMap_p, fromCurrency_p, toCurrency_p)
+		returned_rate, found_rate := GetRate(*currencyMap_p, fromCurrency_p, toCurrency_p)
 		if found_rate {
 			return_convertedAmount = returned_rate * amount_p
 		} else {
