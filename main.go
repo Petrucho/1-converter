@@ -116,7 +116,7 @@ outerLoop:
 
 func calcValues(currencyMap_p *CurrencyMapType, amount_p float64, fromCurrency_p string, toCurrency_p string) (return_convertedAmount float64) {
 	if (amount_p != 0) && (fromCurrency_p != "") && (toCurrency_p != "") {
-		returned_rate, found_rate := GetRate(*currencyMap_p, fromCurrency_p, toCurrency_p)
+		returned_rate, found_rate := GetRate(currencyMap_p, fromCurrency_p, toCurrency_p)
 		if found_rate {
 			return_convertedAmount = returned_rate * amount_p
 		} else {
@@ -129,8 +129,12 @@ func calcValues(currencyMap_p *CurrencyMapType, amount_p float64, fromCurrency_p
 	return
 }
 
-func GetRate(rates CurrencyMapType, from, to string) (float64, bool) {
-	inner, ok := rates[from]
+func GetRate(rates *CurrencyMapType, from, to string) (float64, bool) {
+	if rates == nil {
+		return 0, false
+	}
+
+	inner, ok := (*rates)[from]
 	if !ok {
 		return 0, false // нет такой исходной валюты
 	}
