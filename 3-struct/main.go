@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -14,6 +15,13 @@ type Bin struct {
 
 func main() {
 	BinList := make([]Bin, 0)
+	newBin := &Bin{
+		id:   "1",
+		name: "First Bin",
+	}
+
+	BinList = addBinToList(BinList, newBin)
+	fmt.Println("Длина списка:", len(BinList))
 }
 
 func createBin(id string, private bool, createdAt time.Time, name string) (*Bin, error) {
