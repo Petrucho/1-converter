@@ -31,10 +31,10 @@ func main() {
 	myList := NewBinList()
 
 	// Создаем новый элемент (указатель на Bin)
-	newBin := &Bin{
-		id:        "bin-99",
-		name:      "My First Bin",
-		createdAt: time.Now(),
+	newBin, err := createBin("bin-99", false, time.Now(), "My First Bin")
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
 	// Вызываем метод Add. Так как myList — это уже указатель,
