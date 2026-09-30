@@ -13,15 +13,37 @@ type Bin struct {
 	name      string
 }
 
+type BinList struct{ Bins []Bin }
+
+func (bl *BinList) Add(newBin *Bin) {
+	if newBin != nil && bl != nil {
+		bl.Bins = append(bl.Bins, *newBin)
+	}
+}
+
+func NewBinList() *BinList {
+	return &BinList{
+		Bins: make([]Bin, 0),
+	}
+}
+
 func main() {
-	BinList := make([]Bin, 0)
+	myList := NewBinList()
+
+	// Создаем новый элемент (указатель на Bin)
 	newBin := &Bin{
-		id:   "1",
-		name: "First Bin",
+		id:        "bin-99",
+		name:      "My First Bin",
+		createdAt: time.Now(),
 	}
 
-	BinList = addBinToList(BinList, newBin)
-	fmt.Println("Длина списка:", len(BinList))
+	// Вызываем метод Add. Так как myList — это уже указатель,
+	// Go сам корректно применит метод и обновит слайс внутри myList.
+	myList.Add(newBin)
+
+	// Проверяем результат
+	fmt.Printf("В списке элементов: %d\n", len(myList.Bins))
+	fmt.Printf("Имя первого элемента: %s\n", myList.Bins[0].name)
 }
 
 func createBin(id string, private bool, createdAt time.Time, name string) (*Bin, error) {
@@ -41,11 +63,4 @@ func createBin(id string, private bool, createdAt time.Time, name string) (*Bin,
 		name:      name,
 	}
 	return newBin, nil
-}
-
-func addBinToList(binList []Bin, newBin *Bin) []Bin {
-	if newBin != nil {
-		binList = append(binList, *newBin)
-	}
-	return binList
 }
