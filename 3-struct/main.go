@@ -1,37 +1,19 @@
 package main
 
 import (
-	"errors"
+	"3-struct/api"
+	"3-struct/bins"
+	"3-struct/file"
+	"3-struct/storage"
 	"fmt"
 	"time"
 )
 
-type Bin struct {
-	id        string
-	private   bool
-	createdAt time.Time
-	name      string
-}
-
-type BinList struct{ Bins []Bin }
-
-func (bl *BinList) Add(newBin *Bin) {
-	if newBin != nil && bl != nil {
-		bl.Bins = append(bl.Bins, *newBin)
-	}
-}
-
-func NewBinList() *BinList {
-	return &BinList{
-		Bins: make([]Bin, 0),
-	}
-}
-
 func main() {
-	myList := NewBinList()
+	myList := bins.NewBinList()
 
 	// Создаем новый элемент (указатель на Bin)
-	newBin, err := createBin("bin-99", false, time.Now(), "My First Bin")
+	newBin, err := bins.CreateBin("bin-99", false, time.Now(), "My First Bin")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -41,26 +23,17 @@ func main() {
 	// Go сам корректно применит метод и обновит слайс внутри myList.
 	myList.Add(newBin)
 
-	// Проверяем результат
+	// Проверяем результат пакета bins
 	fmt.Printf("В списке элементов: %d\n", len(myList.Bins))
-	fmt.Printf("Имя первого элемента: %s\n", myList.Bins[0].name)
-}
+	fmt.Printf("Имя первого элемента: %s\n", myList.Bins[0].Name)
 
-func createBin(id string, private bool, createdAt time.Time, name string) (*Bin, error) {
-	if id == "" {
-		return nil, errors.New("INVALID_ID")
-	}
-	if createdAt.IsZero() {
-		return nil, errors.New("INVALID_CREATEDAT")
-	}
-	if name == "" {
-		return nil, errors.New("INVALID_NAME")
-	}
-	newBin := &Bin{
-		id:        id,
-		private:   private,
-		createdAt: createdAt,
-		name:      name,
-	}
-	return newBin, nil
+	// Проверяем результат пакета api
+	api.ReturnSomeText()
+
+	// Проверяем результат пакета file
+	file.ReadFile()
+	file.WriteFile()
+
+	// Проверяем результат пакета storage
+	storage.PrintSomething()
 }
