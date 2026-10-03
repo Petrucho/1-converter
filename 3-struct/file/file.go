@@ -10,18 +10,14 @@ import (
 
 func ReadFile(name string) ([]byte, error) {
 	if fileExists(name) {
-		if strings.ToLower(filepath.Ext(name)) == ".json" {
-			// Используем os.ReadFile для чтения всего файла в память
-			data, err := os.ReadFile(name)
-			if err != nil {
-				// Если произошла ошибка, возвращаем nil вместо данных и саму ошибку
-				return nil, err
-			}
-			// Если всё прошло успешно, возвращаем данные и nil вместо ошибки
-			return data, nil
-		} else {
-			fmt.Printf("Файл не имеет расширения JSON: %s\n", name)
+		// Используем os.ReadFile для чтения всего файла в память
+		data, err := os.ReadFile(name)
+		if err != nil {
+			// Если произошла ошибка, возвращаем nil вместо данных и саму ошибку
+			return nil, err
 		}
+		// Если всё прошло успешно, возвращаем данные и nil вместо ошибки
+		return data, nil
 	} else {
 		fmt.Printf("Файл не найден или не разрешён доступ: %s\n", name)
 	}
@@ -50,5 +46,12 @@ func fileExists(filename string) bool {
 		return false // File explicitly does not exist
 	}
 	// The file might exist, but we got a different error (e.g., permission denied)
+	return false
+}
+
+func IsJSON(name string) bool {
+	if strings.ToLower(filepath.Ext(name)) == ".json" {
+		return true
+	}
 	return false
 }

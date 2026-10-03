@@ -39,21 +39,25 @@ func SaveBins(list *bins.BinList) error {
 // ReadBins читает файл и десериализует его обратно в структуру BinList
 func ReadBins() (*bins.BinList, error) {
 	// Используем пакет file для чтения
-	jsonData, err := file.ReadFile(storageFileName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %w", err)
-	}
-
-	if len(jsonData) > 0 {
-		// Создаем новый пустой список с помощью конструктора
-		list := bins.NewBinList()
-
-		// Наполняем структуру данными из JSON
-		err = json.Unmarshal(jsonData, list)
+	if file.IsJSON(storageFileName) {
+		jsonData, err := file.ReadFile(storageFileName)
 		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshal bins: %w", err)
+			return nil, fmt.Errorf("failed to read file: %w", err)
 		}
-		return list, nil
+
+		if len(jsonData) > 0 {
+			// Создаем новый пустой список с помощью конструктора
+			list := bins.NewBinList()
+
+			// Наполняем структуру данными из JSON
+			err = json.Unmarshal(jsonData, list)
+			if err != nil {
+				return nil, fmt.Errorf("failed to unmarshal bins: %w", err)
+			}
+			return list, nil
+		}
+	} else {
+		fmt.Printf("Файл не имеет расширения JSON: %s\n", storageFileName)
 	}
 	return nil, nil
 }
