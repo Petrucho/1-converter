@@ -1,21 +1,31 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 func ReadFile(name string) ([]byte, error) {
-	fmt.Println("Read file:", name)
-	// Используем os.ReadFile для чтения всего файла в память
-	data, err := os.ReadFile(name)
-	if err != nil {
-		// Если произошла ошибка, возвращаем nil вместо данных и саму ошибку
-		return nil, err
+	if fileExists(name) {
+		if strings.ToLower(filepath.Ext(name)) == ".json" {
+			// Используем os.ReadFile для чтения всего файла в память
+			data, err := os.ReadFile(name)
+			if err != nil {
+				// Если произошла ошибка, возвращаем nil вместо данных и саму ошибку
+				return nil, err
+			}
+			// Если всё прошло успешно, возвращаем данные и nil вместо ошибки
+			return data, nil
+		} else {
+			fmt.Printf("Файл не имеет расширения JSON: %s\n", name)
+		}
+	} else {
+		fmt.Printf("Файл не найден или не разрешён доступ: %s\n", name)
 	}
-
-	// Если всё прошло успешно, возвращаем данные и nil вместо ошибки
-	return data, nil
+	return nil, nil
 }
 
 func WriteFile(content []byte, name string) error {
@@ -30,4 +40,15 @@ func WriteFile(content []byte, name string) error {
 
 	// Если всё прошло успешно, возвращаем nil
 	return nil
+}
+func fileExists(filename string) bool {
+	_, err := os.Stat(filename)
+	if err == nil {
+		return true // File exists
+	}
+	if errors.Is(err, os.ErrNotExist) {
+		return false // File explicitly does not exist
+	}
+	// The file might exist, but we got a different error (e.g., permission denied)
+	return false
 }
