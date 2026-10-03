@@ -39,7 +39,7 @@ func main() {
 	// 4. Читаем данные обратно из файла
 	fmt.Println("\n--- Чтение данных ---")
 	loadedList, err := storage.ReadBins()
-	if err != nil {
+	if err != nil || loadedList == nil {
 		fmt.Println("Ошибка чтения:", err)
 		return
 	}

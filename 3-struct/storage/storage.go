@@ -44,14 +44,16 @@ func ReadBins() (*bins.BinList, error) {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	// Создаем новый пустой список с помощью конструктора
-	list := bins.NewBinList()
+	if len(jsonData) > 0 {
+		// Создаем новый пустой список с помощью конструктора
+		list := bins.NewBinList()
 
-	// Наполняем структуру данными из JSON
-	err = json.Unmarshal(jsonData, list)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal bins: %w", err)
+		// Наполняем структуру данными из JSON
+		err = json.Unmarshal(jsonData, list)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal bins: %w", err)
+		}
+		return list, nil
 	}
-
-	return list, nil
+	return nil, nil
 }
