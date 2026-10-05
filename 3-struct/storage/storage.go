@@ -2,23 +2,39 @@ package storage
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 
 	"3-struct/bins"
 	"3-struct/file"
 )
 
-// Имя файла, в который будем сохранять корзины
-const storageFileName = "bins_storage.json"
+// DefaultFileName — файл, в который сохраняются корзины по умолчанию.
+const DefaultFileName = "bins_storage.json"
 
-func PrintSomething() {
-	fmt.Println("Print from storage package")
+// Storage сериализует список корзин в JSON и читает его обратно.
+// Файловое хранилище приходит снаружи (dependency injection): сам Storage
+// не создаёт его и не знает, что там за реализация — только интерфейс file.Repo.
+type Storage struct {
+	repo file.Repo
 }
 
-// SaveBins сериализует список в JSON и сохраняет в файл
-func SaveBins(list *bins.BinList) error {
+// New собирает Storage поверх файлового репозитория.
+func New(repo file.Repo) (*Storage, error) {
+	if repo == nil {
+		return nil, errors.New("storage: repo is nil")
+	}
+	if !file.IsJSON(repo.Name()) {
+		return nil, fmt.Errorf("storage: %q is not a JSON file", repo.Name())
+	}
+	return &Storage{repo: repo}, nil
+}
+
+// SaveBins сериализует список в JSON и сохраняет в файл.
+func (s *Storage) SaveBins(list *bins.BinList) error {
 	if list == nil {
-		return fmt.Errorf("bin list is nil")
+		return errors.New("bin list is nil")
 	}
 
 	// Маршалим структуру BinList в JSON (с отступами для читаемости)
@@ -27,37 +43,32 @@ func SaveBins(list *bins.BinList) error {
 		return fmt.Errorf("failed to marshal bins: %w", err)
 	}
 
-	// Используем пакет file для записи
-	err = file.WriteFile(jsonData, storageFileName)
-	if err != nil {
+	if err := s.repo.WriteFile(jsonData); err != nil {
 		return fmt.Errorf("failed to save file: %w", err)
 	}
-
 	return nil
 }
 
-// ReadBins читает файл и десериализует его обратно в структуру BinList
-func ReadBins() (*bins.BinList, error) {
-	// Используем пакет file для чтения
-	if file.IsJSON(storageFileName) {
-		jsonData, err := file.ReadFile(storageFileName)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read file: %w", err)
+// ReadBins читает файл и десериализует его обратно в структуру BinList.
+// Если файла ещё нет — возвращает пустой список, а не ошибку.
+func (s *Storage) ReadBins() (*bins.BinList, error) {
+	jsonData, err := s.repo.ReadFile()
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return bins.NewBinList(), nil
 		}
-
-		if len(jsonData) > 0 {
-			// Создаем новый пустой список с помощью конструктора
-			list := bins.NewBinList()
-
-			// Наполняем структуру данными из JSON
-			err = json.Unmarshal(jsonData, list)
-			if err != nil {
-				return nil, fmt.Errorf("failed to unmarshal bins: %w", err)
-			}
-			return list, nil
-		}
-	} else {
-		fmt.Printf("Файл не имеет расширения JSON: %s\n", storageFileName)
+		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
-	return nil, nil
+
+	// Создаем новый пустой список с помощью конструктора
+	list := bins.NewBinList()
+	if len(jsonData) == 0 {
+		return list, nil
+	}
+
+	// Наполняем структуру данными из JSON
+	if err := json.Unmarshal(jsonData, list); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal bins: %w", err)
+	}
+	return list, nil
 }

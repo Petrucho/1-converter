@@ -3,13 +3,13 @@
     {
       "Id": "bin-001",
       "Private": true,
-      "CreatedAt": "2026-10-02T14:32:17.000895728+03:00",
+      "CreatedAt": "2026-10-05T16:30:59.714763217+03:00",
       "Name": "Private Bin"
     },
     {
       "Id": "bin-002",
       "Private": false,
-      "CreatedAt": "2026-10-02T14:32:17.000895802+03:00",
+      "CreatedAt": "2026-10-05T16:30:59.714763608+03:00",
       "Name": "Public Documents"
     }
   ]
