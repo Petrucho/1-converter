@@ -7,31 +7,22 @@ import (
 	"strings"
 )
 
-// Repo — хранилище, работающее с одним файлом.
-// Потребители (storage и т.д.) зависят от этого интерфейса, а не от *JsonDb,
-// поэтому реализацию легко подменить: в тестах — мок в памяти, в проде — диск.
-type Repo interface {
-	// Name возвращает имя файла, с которым работает реализация.
-	Name() string
-	// ReadFile читает файл целиком. Если файла нет, ошибка оборачивает os.ErrNotExist.
-	ReadFile() ([]byte, error)
-	// WriteFile перезаписывает файл содержимым content.
-	WriteFile(content []byte) error
-}
-
-// JsonDb — реализация Repo поверх локальной файловой системы.
+// JsonDb — JSON-файл на локальной файловой системе.
+// Пакет file не объявляет интерфейсов: он просто возвращает конкретный тип,
+// а потребители (storage и т.д.) сами описывают нужные им методы.
 type JsonDb struct {
 	filename string
 }
 
-// Проверка на этапе компиляции: JsonDb удовлетворяет интерфейсу Repo.
-var _ Repo = (*JsonDb)(nil)
-
-// NewJsonDb создаёт репозиторий для конкретного файла.
-func NewJsonDb(name string) *JsonDb {
+// NewJsonDb создаёт хранилище для конкретного файла.
+// Возвращает ошибку, если у файла не расширение .json.
+func NewJsonDb(name string) (*JsonDb, error) {
+	if !IsJSON(name) {
+		return nil, fmt.Errorf("file: %q is not a JSON file", name)
+	}
 	return &JsonDb{
 		filename: name,
-	}
+	}, nil
 }
 
 // Name возвращает имя файла.

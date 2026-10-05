@@ -7,26 +7,33 @@ import (
 	"os"
 
 	"3-struct/bins"
-	"3-struct/file"
 )
 
 // DefaultFileName — файл, в который сохраняются корзины по умолчанию.
 const DefaultFileName = "bins_storage.json"
 
-// Storage сериализует список корзин в JSON и читает его обратно.
-// Файловое хранилище приходит снаружи (dependency injection): сам Storage
-// не создаёт его и не знает, что там за реализация — только интерфейс file.Repo.
-type Storage struct {
-	repo file.Repo
+// FileStore — то, что Storage нужно от файлового хранилища.
+// Интерфейс объявлен рядом с потребителем и содержит только используемые
+// методы, поэтому storage не импортирует пакет file: подойдёт *file.JsonDb
+// или любой мок в памяти.
+type FileStore interface {
+	// ReadFile читает файл целиком. Если файла нет, ошибка оборачивает os.ErrNotExist.
+	ReadFile() ([]byte, error)
+	// WriteFile перезаписывает файл содержимым content.
+	WriteFile(content []byte) error
 }
 
-// New собирает Storage поверх файлового репозитория.
-func New(repo file.Repo) (*Storage, error) {
+// Storage сериализует список корзин в JSON и читает его обратно.
+// Файловое хранилище приходит снаружи (dependency injection): сам Storage
+// не создаёт его и не знает, что там за реализация — только интерфейс FileStore.
+type Storage struct {
+	repo FileStore
+}
+
+// New собирает Storage поверх файлового хранилища.
+func New(repo FileStore) (*Storage, error) {
 	if repo == nil {
 		return nil, errors.New("storage: repo is nil")
-	}
-	if !file.IsJSON(repo.Name()) {
-		return nil, fmt.Errorf("storage: %q is not a JSON file", repo.Name())
 	}
 	return &Storage{repo: repo}, nil
 }
