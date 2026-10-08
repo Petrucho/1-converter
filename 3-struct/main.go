@@ -9,11 +9,15 @@ import (
 	"3-struct/storage"
 )
 
-// Здесь и только здесь собирается граф зависимостей (composition root):
+// Здесь собирается граф зависимостей (composition root):
 // main создаёт конкретные реализации и передаёт их в конструкторы.
 func main() {
-	// file.Repo -> storage.Storage -> bins.Service
-	repo := file.NewJsonDb(storage.DefaultFileName)
+	// file.JsonDb -> storage.Storage -> bins.Service
+	repo, err := file.NewJsonDb(storage.DefaultFileName)
+	if err != nil {
+		fmt.Println("Ошибка создания файлового хранилища:", err)
+		return
+	}
 
 	store, err := storage.New(repo)
 	if err != nil {
