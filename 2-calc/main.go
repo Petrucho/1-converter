@@ -9,20 +9,33 @@ import (
 	"strings"
 )
 
+var menuFunction = map[string]func([]int) int{
+	"AVG": operationAVG,
+	"SUM": operationSUM,
+	"MED": operationMED,
+}
+
 func main() {
 	var someSlice []int
 
 	operationStr := getOperation()
 	someSlice = getSlice()
 	sort.Ints(someSlice)
+
+	menuFunc := menuFunction[operationStr]
+	if menuFunc == nil {
+		fmt.Println("Не настроено меню функций!")
+		return
+	}
+
 	if len(someSlice) > 0 { // non-empty slice
 		switch operationStr {
 		case "AVG":
-			fmt.Printf("AVG = %d\n", operationAVG(someSlice))
+			fmt.Printf("AVG = %d\n", menuFunc(someSlice))
 		case "SUM":
-			fmt.Printf("SUM = %d\n", operationSUM(someSlice))
+			fmt.Printf("SUM = %d\n", menuFunc(someSlice))
 		case "MED":
-			fmt.Printf("MED = %d\n", operationMED(someSlice))
+			fmt.Printf("MED = %d\n", menuFunc(someSlice))
 		default:
 			break
 		}
