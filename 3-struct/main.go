@@ -4,14 +4,21 @@ import (
 	"fmt"
 	"time"
 
+	"3-struct/api"
 	"3-struct/bins"
+	"3-struct/config"
 	"3-struct/file"
 	"3-struct/storage"
 )
 
-// Здесь собирается граф зависимостей (composition root):
-// main создаёт конкретные реализации и передаёт их в конструкторы.
 func main() {
+
+	cfg := config.NewEncrypter() // reads KEY from the environment, panics if it's missing
+	apiClient := api.NewApi(cfg) // hands it to api
+	if apiClient.GetKey() != "" {
+		fmt.Println("Ключ загружен")
+	}
+
 	// file.JsonDb -> storage.Storage -> bins.Service
 	repo, err := file.NewJsonDb(storage.DefaultFileName)
 	if err != nil {
