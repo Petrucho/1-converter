@@ -28,8 +28,9 @@ func main() {
 		return
 	}
 
-	if len(someSlice) > 0 { // non-empty slice
-		switch operationStr {
+	if len(someSlice) > 0 {
+		fmt.Printf("%s = %d\n", operationStr, menuFunc(someSlice)) // non-empty slice
+		/*switch operationStr {
 		case "AVG":
 			fmt.Printf("AVG = %d\n", menuFunc(someSlice))
 		case "SUM":
@@ -38,29 +39,34 @@ func main() {
 			fmt.Printf("MED = %d\n", menuFunc(someSlice))
 		default:
 			break
-		}
+			}*/
 	} else {
 		fmt.Printf("Slice is empty!")
 	}
 }
 
 func getOperation() (return_Operation string) {
+	keys := getKeys(menuFunction)
+	sort.Strings(keys)
 outerLoop:
 	for {
 		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Введите операцию (AVG, SUM, MED): ")
+		fmt.Printf("Введите операцию %s: ", keys)
 		read_Operation, err := reader.ReadString('\n')
 		if err != nil {
 			continue
 		}
 
 		return_Operation = strings.ToUpper(strings.TrimSpace(read_Operation))
-		switch return_Operation {
+		if _, ok := menuFunction[return_Operation]; ok {
+			break outerLoop
+		}
+		/*switch return_Operation {
 		case "AVG", "SUM", "MED":
 			break outerLoop
 		default:
 			continue
-		}
+			}*/
 	}
 	return
 }
@@ -103,4 +109,12 @@ func operationMED(param_slice []int) (return_MED int) {
 		return_MED = (param_slice[(numberCount / 2)])
 	}
 	return
+}
+
+func getKeys(m map[string]func([]int) int) []string {
+	keys := make([]string, 0, len(m)) // заранее резервируем ёмкость
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
 }

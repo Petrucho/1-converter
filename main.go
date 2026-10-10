@@ -1,6 +1,8 @@
 package main
 
 import (
+	"1-converter/api"
+	"1-converter/config"
 	"fmt"
 	"strings"
 )
@@ -12,6 +14,10 @@ const EUR_RUB = 110.
 type CurrencyMapType = map[string]map[string]float64
 
 func main() {
+	cfg := config.NewEncrypter() // reads KEY from the environment, panics if it's missing
+	apiClient := api.NewApi(cfg) // hands it to api
+	fmt.Println(apiClient.GetKey())
+
 	CurrencyMap := CurrencyMapType{"USD": {"EUR": USD_EUR, "RUB": USD_RUB}, "EUR": {"USD": 1 / USD_EUR, "RUB": EUR_RUB}, "RUB": {"USD": 1 / USD_RUB, "EUR": 1 / EUR_RUB}}
 outerLoop:
 	for {
