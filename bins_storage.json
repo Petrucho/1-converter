@@ -1,0 +1,16 @@
+{
+  "Bins": [
+    {
+      "Id": "bin-001",
+      "Private": true,
+      "CreatedAt": "2026-10-14T17:13:05.141689552+03:00",
+      "Name": "Private Bin"
+    },
+    {
+      "Id": "bin-002",
+      "Private": false,
+      "CreatedAt": "2026-10-14T17:13:05.141689767+03:00",
+      "Name": "Public Documents"
+    }
+  ]
+}
