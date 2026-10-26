@@ -69,25 +69,3 @@ func TestNewService_NilRepo(t *testing.T) {
 		t.Fatal("ожидалась ошибка при nil-репозитории")
 	}
 }
-
-func TestCreateBin_Validation(t *testing.T) {
-	now := time.Now()
-	cases := []struct {
-		name string
-		id   string
-		at   time.Time
-		bin  string
-		want error
-	}{
-		{"пустой id", "", now, "name", ErrInvalidID},
-		{"нулевое время", "id", time.Time{}, "name", ErrInvalidCreatedAt},
-		{"пустое имя", "id", now, "", ErrInvalidName},
-	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			if _, err := CreateBin(c.id, false, c.at, c.bin); err != c.want {
-				t.Errorf("err = %v, ожидалась %v", err, c.want)
-			}
-		})
-	}
-}

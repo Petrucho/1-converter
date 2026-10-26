@@ -16,9 +16,9 @@ func NewEncrypter() *Encrypter {
 	if err != nil {
 		fmt.Println("Не удалось загрузить ENV-файл!")
 	}
-	key := os.Getenv("KEY")
+	key := os.Getenv("JSONBINMASTERKEY")
 	if key == "" {
-		panic("Не передан параметр KEY в переменные окружения!")
+		panic("Не передан параметр JSONBINMASTERKEY в переменные окружения!")
 	}
 	return &Encrypter{
 		Key: key,
